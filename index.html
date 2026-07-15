@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ketik Awan Ceria</title>
+    <style>
+        :root {
+            --sky-blue: #a1c4fd;
+            --sky-blue-light: #c2e9fb;
+            --cloud-white: #ffffff;
+            --soft-blue: #4a90e2;
+            --text-dark: #333333;
+            --emas: #ffd700;
+            --perak: #c0c0c0;
+            --perunggu: #cd7f32;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(180deg, var(--sky-blue) 0%, var(--sky-blue-light) 100%);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background Awan Bergerak */
+        .background-clouds {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .cloud {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 100px;
+            position: absolute;
+            animation: moveClouds linear infinite;
+        }
+
+        .cloud::before, .cloud::after {
+            content: '';
+            background: rgba(255, 255, 255, 0.7);
+            position: absolute;
+            border-radius: 50%;
+        }
+
+        .cloud-1 { width: 150px; height: 50px; top: 15%; left: -150px; animation-duration: 25s; }
+        .cloud-1::before { width: 70px; height: 70px; top: -30px; left: 20px; }
+        .cloud-1::after { width: 50px; height: 50px; top: -20px; right: 20px; }
+
+        .cloud-2 { width: 220px; height: 70px; top: 45%; left: -220px; animation-duration: 35s; animation-delay: 5s; }
+        .cloud-2::before { width: 100px; height: 100px; top: -50px; left: 30px; }
+        .cloud-2::after { width: 70px; height: 70px; top: -30px; right: 30px; }
+
+        .cloud-3 { width: 120px; height: 40px; top: 75%; left: -120px; animation-duration: 20s; animation-delay: 10s; }
+        .cloud-3::before { width: 50px; height: 50px; top: -20px; left: 15px; }
+        .cloud-3::after { width: 40px; height: 40px; top: -15px; right: 15px; }
+
+        @keyframes moveClouds {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(100vw + 250px)); }
+        }
+
+        /* Container Utama Game */
+        .game-box {
+            background-color: rgba(255, 255, 255, 0.93);
+            backdrop-filter: blur(5px);
+            border: 3px solid var(--cloud-white);
+            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.15);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 480px;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            z-index: 2; 
+        }
+
+        h1.judul {
+            font-size: 26px;
+            color: var(--soft-blue);
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+
+        .layar {
+            display: none;
+        }
+
+        .layar.aktif {
+            display: block;
+        }
+
+        /* Pengaturan Durasi & Bahasa */
+        .pengaturan-grup {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .pengaturan-grup label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .pilihan-opsi {
+            display: flex;
+            gap: 8px;
+        }
+
+        .pilihan-opsi button {
+            flex: 1;
+            padding: 10px;
+            font-size: 13px;
+            background: #e2e8f0;
+            color: #475569;
+            border-radius: 10px;
+            box-shadow: none;
+        }
+
+        .pilihan-opsi button.pilihan-aktif {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: var(--cloud-white);
+            box-shadow: 0 4px 10px rgba(79, 172, 254, 0.2);
+        }
+
+        /* Papan Juara */
+        .papan-skor {
+            background: #f0f5ff;
+            border-radius: 16px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            border: 1px solid #d0e1fd;
+        }
+
+        .papan-judul {
+            color: var(--soft-blue);
+            font-size: 15px;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .kartu-juara {
+            display: flex;
+            flex-direction: column;
+            padding: 10px 12px;
+            margin: 8px 0;
+            border-radius: 10px;
+            background: var(--cloud-white);
+            font-weight: bold;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .baris-atas {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .baris-bawah {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #7f8c8d;
+            margin-top: 4px;
+            font-weight: normal;
+        }
+
+        .juara-1 { border-left: 5px solid var(--emas); }
+        .juara-1 .baris-atas { color: #b38600; }
+        .juara-2 { border-left: 5px solid var(--perak); }
+        .juara-2 .baris-atas { color: #757575; }
+        .juara-3 { border-left: 5px solid var(--perunggu); }
+        .juara-3 .baris-atas { color: #8d5524; }
+        
+        .no-data {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            padding: 10px 0;
+        }
+
+        /* Input */
+        input[type="text"] {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 2px solid #cbd5e1;
+            background: var(--cloud-white);
+            color: var(--text-dark);
+            font-size: 16px;
+            margin-bottom: 15px;
+            outline: none;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--soft-blue);
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.2);
+        }
+
+        .btn-utama {
+            width: 100%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: var(--cloud-white);
+            border: none;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+            transition: 0.2s;
+        }
+
+        .btn-utama:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        /* Gameplay */
+        .info-game {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+            font-size: 14px;
+            background: #f0f5ff;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .info-angka {
+            color: var(--soft-blue);
+        }
+
+        .box-teks {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            border: 2px solid #e2e8f0;
+            text-align: left;
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+            overflow-wrap: break-word;
+            min-height: 100px;
+            display: block; 
+        }
+
+        .box-teks span {
+            display: inline-block;
+            white-space: pre-wrap;
+        }
+
+        .huruf-benar {
+            color: #2ec4b6;
+            font-weight: bold;
+        }
+
+        .huruf-salah {
+            color: #ff3366;
+            background-color: rgba(255, 51, 102, 0.15);
+            border-radius: 2px;
+        }
+
+        .huruf-aktif {
+            border-bottom: 3px solid var(--soft-blue);
+        }
+
+        .hasil-box {
+            font-size: 40px;
+            color: var(--soft-blue);
+            margin: 15px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="background-clouds">
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+</div>
+
+<div class="game-box">
+    <!-- LAYAR 1: LOBBY -->
+    <div id="layar-lobby" class="layar aktif">
+        <h1 class="judul">☁️ Ketik Awan Ceria</h1>
+        
+        <input type="text" id="nama-pemain" placeholder="Masukkan Nama..." maxlength="12">
+        
+        <!-- Pilihan Durasi & Bahasa -->
+        <div class="pengaturan-grup">
+            <label>⏱️ Pilih Durasi Waktu:</label>
+            <div class="pilihan-opsi" id="grup-waktu">
+                <button type="button" class="pilihan-aktif" onclick="pilihWaktu(25)">25s</button>
+                <button type="button" onclick="pilihWaktu(50)">50s</button>
+                <button type="button" onclick="pilihWaktu(80)">1m 20s</button>
+            </div>
+
+            <label>🌐 Pilih Bahasa:</label>
+            <div class="pilihan-opsi" id="grup-bahasa">
+                <button type="button" class="pilihan-aktif" onclick="pilihBahasa('id')">Indonesia 🇮🇩</button>
+                <button type="button" onclick="pilihBahasa('en')">English 🇬🇧</button>
+                <button type="button" onclick="pilihBahasa('my')">Malaysia 🇲🇾</button>
+            </div>
+        </div>
+
+        <div class="papan-skor">
+            <div class="papan-judul">🏆 Papan Peringkat Juara 🏆</div>
+            <div id="konten-leaderboard">
+                <!-- Diisi oleh JS -->
+            </div>
+        </div>
+        
+        <button class="btn-utama" onclick="mulaiGame()">Mulai Bermain 🎈</button>
+    </div>
+
+    <!-- LAYAR 2: GAMEPLAY -->
+    <div id="layar-game" class="layar">
+        <div class="info-game">
+            <div>Waktu: <span id="timer-angka" class="info-angka">25</span>s</div>
+            <div>Kecepatan: <span id="wpm-angka" class="info-angka">0 WPM</span></div>
+            <div>Akurasi: <span id="acc-angka" class="info-angka">100%</span></div>
+        </div>
+        
+        <div class="box-teks" id="teks-tantangan">
+            Memuat teks...
+        </div>
+        
+        <input type="text" id="input-ketik" placeholder="Ketik kalimat di atas..." autocomplete="off">
+        
+        <button id="tombol-lanjut" onclick="keKalimatBerikutnya()" style="background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); color: var(--text-dark); margin-bottom: 10px; font-size: 14px; padding: 10px; border: none; border-radius: 10px; width: 100%; cursor: pointer;">
+            Lewati Kalimat Ini ➡️
+        </button>
+
+        <button onclick="selesaiGame(true)" style="background: transparent; border: 2px solid #ff3366; color: #ff3366; box-shadow: none; padding: 10px; font-size: 14px; border-radius: 10px; width: 100%; cursor: pointer;">
+            Keluar Game ❌
+        </button>
+    </div>
+
+    <!-- LAYAR 3: SELESAI -->
+    <div id="layar-selesai" class="layar">
+        <h1 class="judul">Waktu Selesai! 🎉</h1>
+        <p>Total Kecepatan Mengetik:</p>
+        <div class="hasil-box" id="hasil-wpm">0 WPM</div>
+        <p style="margin-bottom: 20px;">Akurasi Akhir: <span id="hasil-acc" style="color: var(--soft-blue); font-weight: bold;">0%</span></p>
+        
+        <button class="btn-utama" onclick="keLobby()">Kembali Ke Lobby 🏠</button>
+    </div>
+</div>
+
+<script>
+    // Bank Kalimat 3 Bahasa
+    const bankKalimat = {
+        id: [
+            "matahari bersinar sangat cerah di pagi yang indah ini",
+            "burung kecil itu sedang bernyanyi merdu di atas ranting pohon",
+            "angin berembus sepoi sepoi membawa kesegaran di sore hari",
+            "aku suka minum segelas jus jeruk yang dingin saat siang hari",
+            "pelangi yang indah muncul setelah hujan deras reda tadi siang",
+            "kupu kupu terbang menari di antara kelopak bunga mawar merah",
+            "kelinci putih itu meloncat loncat dengan gembira di rumput hijau"
+        ],
+        en: [
+            "the sun shines very brightly on this beautiful morning",
+            "the little bird is singing sweetly on the tree branch",
+            "the gentle wind blows freshness in the afternoon",
+            "i like to drink a glass of cold orange juice in the afternoon",
+            "a beautiful rainbow appears after the heavy rain cleared",
+            "butterflies fly and dance among the red rose petals",
+            "the white rabbit jumps happily on the green grass"
+        ],
+        my: [
+            "matahari bersinar sangat cerah pada pagi yang indah ini",
+            "burung kecil itu sedang menyanyi merdu di atas dahan pokok",
+            "angin bertiup sepoi sepoi membawa kesegaran di waktu petang",
+            "saya suka minum segelas jus oren yang sejuk pada waktu siang",
+            "pelangi yang indah muncul selepas hujan lebat reda petang tadi",
+            "rama rama terbang menari di antara kelopak bunga mawar merah",
+            "arnab putih itu melompat lompat dengan gembira di rumput hijau"
+        ]
+    };
+
+    let timer;
+    let waktuDipilih = 25; // Default 25s
+    let sisaWaktu = 25;
+    let bahasaDipilih = 'id'; // Default Indonesia
+    let namaUser = "Pemain";
+    let teksSekarang = "";
+    
+    let totalKarakterBenar = 0;
+    let totalKarakterDikehendaki = 0;
+
+    // Logika Kunci Kata
+    let indeksKataTerkunci = 0; // Menyimpan batas indeks teks yang sudah di-spasi dan tidak bisa diedit
+
+    tampilkanLeaderboard();
+
+    function pilihWaktu(detik) {
+        waktuDipilih = detik;
+        const tombols = document.querySelectorAll('#grup-waktu button');
+        tombols.forEach(btn => btn.classList.remove('pilihan-aktif'));
+        event.target.classList.add('pilihan-aktif');
+    }
+
+    function pilihBahasa(lang) {
+        bahasaDipilih = lang;
+        const tombols = document.querySelectorAll('#grup-bahasa button');
+        tombols.forEach(btn => btn.classList.remove('pilihan-aktif'));
+        event.target.classList.add('pilihan-aktif');
+    }
+
+    function mulaiGame() {
+        const inputNama = document.getElementById('nama-pemain').value.trim();
+        if (inputNama === "") {
+            alert("Harap masukkan nama kamu terlebih dahulu!");
+            return;
+        }
+        namaUser = inputNama;
+        sisaWaktu = waktuDipilih;
+        
+        totalKarakterBenar = 0;
+        totalKarakterDikehendaki = 0;
+        indeksKataTerkunci = 0;
+        
+        document.getElementById('timer-angka').textContent = sisaWaktu;
+        document.getElementById('wpm-angka').textContent = "0 WPM";
+        document.getElementById('acc-angka').textContent = "100%";
+        document.getElementById('input-ketik').value = "";
+        
+        gantiKalimatAcak();
+
+        gantiLayar('layar-game');
+        document.getElementById('input-ketik').focus();
+
+        clearInterval(timer);
+        
+        // Listener input ketikan
+        const inputKetik = document.getElementById('input-ketik');
+        inputKetik.addEventListener('input', prosesMengetik);
+        inputKetik.addEventListener('keydown', proteksiKunciKata);
+        
+        timer = setInterval(() => {
+            sisaWaktu--;
+            document.getElementById('timer-angka').textContent = sisaWaktu;
+            
+            if (sisaWaktu <= 0) {
+                selesaiGame(false);
+            }
+        }, 1000);
+    }
+
+    function gantiKalimatAcak() {
+        const daftarKalimat = bankKalimat[bahasaDipilih];
+        teksSekarang = daftarKalimat[Math.floor(Math.random() * daftarKalimat.length)];
+        indeksKataTerkunci = 0;
+        siapkanTeksTantangan();
+        document.getElementById('input-ketik').value = "";
+        document.getElementById('input-ketik').focus();
+    }
+
+    function siapkanTeksTantangan() {
+        const wadahTeks = document.getElementById('teks-tantangan');
+        wadahTeks.innerHTML = "";
+        teksSekarang.split("").forEach((huruf, index) => {
+            const spanHuruf = document.createElement('span');
+            if (huruf === " ") {
+                spanHuruf.innerHTML = "&nbsp;";
+            } else {
+                spanHuruf.innerText = huruf;
+            }
+            if (index === 0) spanHuruf.classList.add('huruf-aktif');
+            wadahTeks.appendChild(spanHuruf);
+        });
+    }
+
+    // Fungsi mencegah hapus (Backspace) jika sudah melewati spasi kata sebelumnya
+    function proteksiKunciKata(e) {
+        const inputArea = document.getElementById('input-ketik');
+        
+        if (e.key === 'Backspace') {
+            // Jika kursor diarahkan ke bagian yang sudah terkunci, blokir penghapusan
+            if (inputArea.selectionStart <= indeksKataTerkunci) {
+                e.preventDefault();
+            }
+        }
+    }
+
+    function prosesMengetik() {
+        const inputArea = document.getElementById('input-ketik');
+        let teksKetik = inputArea.value;
+        const semuaSpan = document.querySelectorAll('#teks-tantangan span');
+
+        // Deteksi Spasi untuk Mengunci Kata
+        if (teksKetik.endsWith(" ")) {
+            indeksKataTerkunci = teksKetik.length;
+        }
+
+        // Mencegah kecurangan menghapus teks yang sudah terkunci dengan seleksi manual
+        if (inputArea.value.length < indeksKataTerkunci) {
+            inputArea.value = teksKetik.padEnd(indeksKataTerkunci, " ");
+            teksKetik = inputArea.value;
+        }
+
+        let karakterBenarSesiIni = 0;
+
+        semuaSpan.forEach((span, index) => {
+            const hurufKetik = teksKetik[index];
+            span.classList.remove('huruf-benar', 'huruf-salah', 'huruf-aktif');
+            const karakterAsli = span.innerHTML === "&nbsp;" ? " " : span.innerText;
+
+            if (hurufKetik == null) {
+                if (index === teksKetik.length) {
+                    span.classList.add('huruf-aktif');
+                }
+            } else if (hurufKetik === karakterAsli) {
+                span.classList.add('huruf-benar');
+                karakterBenarSesiIni++;
+            } else {
+                span.classList.add('huruf-salah');
+            }
+        });
+
+        // Hitung skor sementara
+        let totalBenar = totalKarakterBenar + karakterBenarSesiIni;
+        let totalKetik = totalKarakterDikehendaki + teksKetik.length;
+        let akurasi = totalKetik > 0 ? Math.round((totalBenar / totalKetik) * 100) : 100;
+        document.getElementById('acc-angka').textContent = akurasi + "%";
+
+        let waktuBerjalanMenit = (waktuDipilih - sisaWaktu) / 60;
+        if (waktuBerjalanMenit <= 0) waktuBerjalanMenit = 0.01;
+        let nilaiWpm = Math.round((totalBenar / 5) / waktuBerjalanMenit);
+        document.getElementById('wpm-angka').textContent = nilaiWpm + " WPM";
+
+        // Fitur Auto-Next jika kalimat selesai diketik
+        if (teksKetik.length >= teksSekarang.length) {
+            setTimeout(() => {
+                keKalimatBerikutnya();
+            }, 50);
+        }
+    }
+
+    function keKalimatBerikutnya() {
+        const inputArea = document.getElementById('input-ketik');
+        const teksKetik = inputArea.value;
+
+        let karakterBenarSesiIni = 0;
+        const semuaSpan = document.querySelectorAll('#teks-tantangan span');
+        semuaSpan.forEach((span, index) => {
+            const hurufKetik = teksKetik[index];
+            const karakterAsli = span.innerHTML === "&nbsp;" ? " " : span.innerText;
+            if (hurufKetik != null && hurufKetik === karakterAsli) {
+                karakterBenarSesiIni++;
+            }
+        });
+
+        totalKarakterBenar += karakterBenarSesiIni;
+        totalKarakterDikehendaki += teksKetik.length;
+
+        gantiKalimatAcak();
+    }
+
+    function selesaiGame(menyerah) {
+        clearInterval(timer);
+        
+        const inputKetik = document.getElementById('input-ketik');
+        inputKetik.removeEventListener('input', prosesMengetik);
+        inputKetik.removeEventListener('keydown', proteksiKunciKata);
+
+        keKalimatBerikutnya();
+
+        let skorWpm = parseInt(document.getElementById('wpm-angka').textContent);
+        let skorAcc = parseInt(document.getElementById('acc-angka').textContent);
+
+        if (menyerah) {
+            skorWpm = 0;
+            skorAcc = 0;
+        }
+
+        document.getElementById('hasil-wpm').textContent = skorWpm + " WPM";
+        document.getElementById('hasil-acc').textContent = skorAcc + "%";
+
+        if (!menyerah && skorAcc >= 50) {
+            simpanSkor(namaUser, skorWpm, skorAcc, waktuDipilih, bahasaDipilih);
+        }
+
+        gantiLayar('layar-selesai');
+    }
+
+    function simpanSkor(nama, wpm, acc, waktu, bahasa) {
+        let papanSaves = JSON.parse(localStorage.getItem('typing_saves_sky_v2')) || [];
+        papanSaves.push({ nama: nama, wpm: wpm, acc: acc, waktu: waktu, bahasa: bahasa });
+        
+        // Urutkan WPM tertinggi, jika sama urutkan akurasi tertinggi
+        papanSaves.sort((a, b) => b.wpm === a.wpm ? b.acc - a.acc : b.wpm - a.wpm);
+        papanSaves = papanSaves.slice(0, 5); // Simpan 5 besar peringkat
+
+        localStorage.setItem('typing_saves_sky_v2', JSON.stringify(papanSaves));
+        tampilkanLeaderboard();
+    }
+
+    function tampilkanLeaderboard() {
+        const papanSaves = JSON.parse(localStorage.getItem('typing_saves_sky_v2')) || [];
+        const wadahLeaderboard = document.getElementById('konten-leaderboard');
+        wadahLeaderboard.innerHTML = "";
+
+        if (papanSaves.length === 0) {
+            wadahLeaderboard.innerHTML = `<div class="no-data">Belum ada rekor juara. Ayo jadi yang pertama! 🎈</div>`;
+            return;
+        }
+
+        const kelasJuara = ["juara-1", "juara-2", "juara-3", "juara-4", "juara-5"];
+        const piala = ["🥇 Juara 1", "🥈 Juara 2", "🥉 Juara 3", "🎖️ Peringkat 4", "🎖️ Peringkat 5"];
+
+        papanSaves.forEach((data, index) => {
+            // Konversi format teks waktu agar rapi di leaderboard
+            let formatWaktu = data.waktu === 80 ? "1m 20s" : `${data.waktu}s`;
+            let bendera = data.bahasa === 'en' ? '🇬🇧' : data.bahasa === 'my' ? '🇲🇾' : '🇮🇩';
+
+            wadahLeaderboard.innerHTML += `
+                <div class="kartu-juara ${kelasJuara[index] || ''}">
+                    <div class="baris-atas">
+                        <span>${piala[index] ? piala[index] : `Peringkat ${index+1}`}: ${data.nama}</span>
+                        <span>${data.wpm} WPM</span>
+                    </div>
+                    <div class="baris-bawah">
+                        <span>Bahasa: ${bendera} ${data.bahasa.toUpperCase()}</span>
+                        <span>Durasi Bermain: ⏱️ ${formatWaktu} (Acc: ${data.acc}%)</span>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function keLobby() {
+        gantiLayar('layar-lobby');
+    }
+
+    function gantiLayar(idLayar) {
+        document.querySelectorAll('.layar').forEach(layar => {
+            layar.classList.remove('aktif');
+        });
+        document.getElementById(idLayar).classList.add('aktif');
+    }
+</script>
+
+</body>
+</html>
