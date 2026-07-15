@@ -23,6 +23,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        /* 🛡️ FITUR KEAMANAN: Mematikan seleksi/blokir teks pada seluruh halaman */
         body {
             background: linear-gradient(180deg, var(--sky-blue) 0%, var(--sky-blue-light) 100%);
             color: var(--text-dark);
@@ -33,6 +34,11 @@
             padding: 15px;
             position: relative;
             overflow: hidden;
+            
+            -webkit-user-select: none;  /* Safari/Chrome iOS */
+            -moz-user-select: none;     /* Firefox */
+            -ms-user-select: none;      /* IE/Edge */
+            user-select: none;          /* Standar Chrome/Opera */
         }
 
         /* Background Awan Bergerak */
@@ -304,7 +310,14 @@
         }
     </style>
 </head>
-<body>
+
+<!-- 
+  🔒 FITUR KEAMANAN UTAMA: 
+  - oncontextmenu="return false;" (Mencegah Klik Kanan)
+  - ondragstart="return false;" (Mencegah teks diseret/di-drag mouse)
+  - ondrop="return false;" (Mencegah teks hasil drag dilepas ke halaman)
+-->
+<body oncontextmenu="return false;" ondragstart="return false;" ondrop="return false;">
 
 <div class="background-clouds">
     <div class="cloud cloud-1"></div>
@@ -673,6 +686,20 @@
         });
         document.getElementById(idLayar).classList.add('aktif');
     }
+
+    // ==========================================================
+    // 🛡️ FITUR KEAMANAN: Mematikan shortcut keyboard Copy (Ctrl + C & Ctrl + U)
+    // ==========================================================
+    document.addEventListener('keydown', function(e) {
+        // Blokir Ctrl + C (Copy)
+        if (e.ctrlKey && e.key === 'c') {
+            e.preventDefault();
+        }
+        // Blokir Ctrl + U (View Source Code)
+        if (e.ctrlKey && e.key === 'u') {
+            e.preventDefault();
+        }
+    });
 </script>
 
 </body>
